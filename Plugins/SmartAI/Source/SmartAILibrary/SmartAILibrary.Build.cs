@@ -28,6 +28,7 @@ public class SmartAILibrary : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
+				"Engine"
 				// ... add other public dependencies that you statically link with here ...
 			}
 		);

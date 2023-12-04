@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// 作者逸辰，有问题请联系2394439184@qq.com
 // 智能AI的基础
 
 using UnrealBuildTool;
