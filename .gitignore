@@ -80,3 +80,4 @@ DerivedDataCache/*
 Plugins/Developer/*
 Plugins/UnLua/*
 /Package
+Content/*
