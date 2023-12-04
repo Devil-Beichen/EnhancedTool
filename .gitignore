@@ -75,6 +75,8 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# Custom files
 Plugins/Developer/*
 Plugins/UnLua/*
 /Package
