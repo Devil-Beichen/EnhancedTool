@@ -28,7 +28,7 @@ public class SmartAILibrary : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Engine"
+				"Core",
 				// ... add other public dependencies that you statically link with here ...
 			}
 		);
@@ -37,7 +37,8 @@ public class SmartAILibrary : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+				"CoreUObject",
+				"Engine",
 				// ... add private dependencies that you statically link with here ...	
 			}
 		);
