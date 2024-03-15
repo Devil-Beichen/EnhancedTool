@@ -37,6 +37,8 @@ public class SmartAITool : ModuleRules
 			new string[]
 			{
 				"Core",
+				"CoreUObject",
+				"Engine",
 				"SmartAI"
 				// ... add private dependencies that you statically link with here ...	
 			}
@@ -46,6 +48,7 @@ public class SmartAITool : ModuleRules
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
+				
 				// ... add any modules that your module loads dynamically here ...
 			}
 		);

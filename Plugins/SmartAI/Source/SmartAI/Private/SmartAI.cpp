@@ -10,12 +10,12 @@ void FSmartAIModule::StartupModule()
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	if (IsLicenseValid())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("有效"));
+		UE_LOG(LogTemp, Warning, TEXT("插件授权有效！！！"));
 	}
 	else
 	{
 		// FMessageDialog::Open(EAppMsgType::Ok, FText::FromString(TEXT("Please contact the plug author for permission!!! 2394439184@qq.com")));
-		UE_LOG(LogTemp, Error, TEXT("无效"));
+		UE_LOG(LogTemp, Error, TEXT("插件授权无效"));
 
 		FGenericPlatformMisc::RequestExit(false);
 	}
