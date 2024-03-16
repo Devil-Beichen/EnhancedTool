@@ -72,16 +72,20 @@ public:
 
 #pragma region 共用属性
 
+	// 游戏中隐藏
+	UPROPERTY(EditAnywhere, DisplayName= "游戏中隐藏", Category="基础")
+	uint8 bGameInHidden : 1;
+
 	// 表面对齐
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName="表面对齐", Category="基础")
 	uint8 bAlignSurface : 1;
 
 	// 相差距离(生成位置高 当前位置+相差距离/2，生成位置低 当前位置+相差距离/2 )
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=( EditCondition = "bAlignSurface == true", EditConditionHides), Category="基础")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=( DisplayName = "检测距离", EditCondition = "bAlignSurface == true", EditConditionHides), Category="基础")
 	float ApartFrom = 500.f;
 
 	// 碰撞类型
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=( EditCondition = "bAlignSurface == true", EditConditionHides), Category="基础")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=( DisplayName="碰撞类型", EditCondition = "bAlignSurface == true", EditConditionHides), Category="基础")
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 
 	/** 获得最终位置
@@ -93,35 +97,35 @@ public:
 	FVector GetFinalPosition(FVector ApartFromLocation) const;
 
 	// 阵型
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName="阵型", Category="基础|阵型相关")
 	EFormation Formation = EFormation::EF_Rectangle;
 
 	// 生成朝向
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName="朝向", Category="基础|阵型相关")
 	EDirection Direction = EDirection::ED_Default;
 
 	// 朝向Actor
-	UPROPERTY(EditAnywhere, meta=(EditCondition = "Direction == EDirection::ED_WatchDirection", EditConditionHides), Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, meta=(DisplayName="朝向Actor", EditCondition = "Direction == EDirection::ED_WatchDirection", EditConditionHides), Category="基础|阵型相关")
 	TObjectPtr<AActor> LookAtActor;
 
 	// 总数
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ClampMin = 0), Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName="总数", meta=(ClampMin = 0), Category="基础|阵型相关")
 	int32 Sun = 16;
 
 	// 可以随机大小
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName= "CanRandomSize", Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName= "随机大小", Category="基础|阵型相关")
 	uint8 bCanRandomSize : 1;
 
 	// Actor大小
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin = 0.f, EditCondition = "bCanRandomSize == false", EditConditionHides), Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(DisplayName = "大小", ClampMin = 0.f, EditCondition = "bCanRandomSize == false", EditConditionHides), Category="基础|阵型相关")
 	float ActorSize = 1.f;
 
 	// Actor最小值
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin = 0.f, EditCondition = "bCanRandomSize == true", EditConditionHides), Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(DisplayName = "最小值", ClampMin = 0.f, EditCondition = "bCanRandomSize == true", EditConditionHides), Category="基础|阵型相关")
 	float MinActorSize = 1.f;
 
 	// Actor最大值
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(ClampMin = 0.f, EditCondition = "bCanRandomSize == true", EditConditionHides), Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(DisplayName = "最大值", ClampMin = 0.f, EditCondition = "bCanRandomSize == true", EditConditionHides), Category="基础|阵型相关")
 	float MaxActorSize = 1.f;
 
 	// 获得自己的3D大小
@@ -132,19 +136,19 @@ public:
 	};
 
 	// 间距
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition = "Formation != EFormation::EF_Round && Formation != EFormation::EF_Donut", EditConditionHides), Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(DisplayName = "间距", EditCondition = "Formation != EFormation::EF_Round && Formation != EFormation::EF_Donut", EditConditionHides), Category="基础|阵型相关")
 	FVector2D Spacing{150.f, 150.f};
 
 	// 间距
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition = "Formation == EFormation::EF_Round || Formation == EFormation::EF_Donut", EditConditionHides), Category="基础|阵型相关")
-	float Interval = 200.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(DisplayName = "间距", EditCondition = "Formation == EFormation::EF_Round || Formation == EFormation::EF_Donut", EditConditionHides), Category="基础|阵型相关")
+	float Interval = 100.f;
 
 	// 随机加的距离半径
-	UPROPERTY(EditAnywhere, Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, DisplayName = "随机半径", Category="基础|阵型相关")
 	float RandomDistance;
 
 	// 随机种子
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="基础|阵型相关")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName="种子", Category="基础|阵型相关")
 	FRandomStream Seed;
 
 	// 添加一个随机位置
@@ -171,19 +175,19 @@ public:
 	FRotator GetOrientation(const FVector& LastTempRelativeLocation) const;
 
 	// 需要生成的角色
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="基础|生成相关")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName="生成的Character", Category="基础|生成相关")
 	TArray<TSubclassOf<ASaCharacterBase>> Characters;
 
 	// 灯光通道
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="基础|渲染相关")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName="灯光通道", Category="基础|渲染相关")
 	FLightingChannels LightingChannels;
 
 	// 渲染自定义深度通道
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(InlineEditConditionToggle = true), Category="基础|渲染相关")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(DisplayName = "自定义深度通道", InlineEditConditionToggle = true), Category="基础|渲染相关")
 	uint8 bRenderCustomDepthPass : 1;
 
 	// 自定义深度模板值
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(EditCondition = "bRenderCustomDepthPass"), Category="基础|渲染相关")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(DisplayName = "自定义深度模板值", EditCondition = "bRenderCustomDepthPass"), Category="基础|渲染相关")
 	uint8 CustomDepthStencilValue = 0;
 
 	/** 设置灯光和渲染通道
@@ -203,12 +207,61 @@ public:
 
 	// 矩形参数
 	UPROPERTY
-	(EditAnywhere, BlueprintReadWrite, meta=(EditCondition = "Formation == EFormation::EF_Rectangle", EditConditionHides), Category="基础|阵型相关")
+	(EditAnywhere, BlueprintReadWrite, meta=(DisplayName = "矩形参数", EditCondition = "Formation == EFormation::EF_Rectangle", EditConditionHides), Category="基础|阵型相关")
 	FRectangle Rectangle;
 
 	// 矩形
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "阵型函数")
 	void FunRectangle();
+
+
+#pragma endregion
+
+#pragma region 三角形
+
+	// 三角形参数
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(DisplayName="三角形参数", EditCondition = "Formation == EFormation::EF_Triangle", EditConditionHides), Category="基础|阵型相关")
+	FTriangle Triangle;
+
+	// 三角形
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "阵型函数")
+	void FunTriangle();
+
+#pragma endregion
+
+#pragma region 圆环
+	// 圆环参数
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(DisplayName="圆环参数", EditCondition = "Formation == EFormation::EF_Donut", EditConditionHides), Category = "基础|阵型相关")
+	FDonut Donut;
+
+	// 圆形
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "阵型函数")
+	void FunDonut();
+
+	// 最终相邻的角度
+	FORCEINLINE float FinalAngle() const
+	{
+		return Donut.Angle < 360.f ? (Donut.Angle / (Donut.NumberOfLayer - 1) * Donut.NumberOfLayer) : Donut.Angle;
+	}
+#pragma endregion
+
+#pragma region 圆形
+
+	// 圆形参数
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(DisplayName="圆形参数", EditCondition = "Formation == EFormation::EF_Round", EditConditionHides), Category = "基础|阵型相关")
+	FRound Round;
+
+	// 圆形
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "阵型函数")
+	void FunRound();
+	
+	/** 前面的数量
+	 * @brief 
+	 * @param CircleRadius 半径
+	 * @param Layer 层数
+	 */
+	UFUNCTION(BlueprintPure, Category="阵型函数")
+	int32 GetFrontNum(const float CircleRadius, const int32 Layer) const;
 
 
 #pragma endregion

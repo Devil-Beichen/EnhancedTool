@@ -43,11 +43,11 @@ struct FRectangle
 {
 	GENERATED_USTRUCT_BODY()
 
-	// 横向
+	// 横向（默认X轴为横向）
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="矩形")
 	int32 Crosswise;
 
-	// 纵向
+	// 纵向（默认Y轴为纵向）
 	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly, Category="矩形")
 	int32 Parallel;
 
@@ -125,11 +125,11 @@ struct FRound
 	GENERATED_USTRUCT_BODY()
 
 	// 圆半径
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "圆形")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName="半径", Category = "圆形")
 	float CircleRadius;
 
 	// 层数
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "圆形")
+	UPROPERTY(VisibleInstanceOnly, DisplayName="层数", BlueprintReadWrite, Category = "圆形")
 	int32 Layer;
 
 	FRound(): CircleRadius(100.f), Layer(1)

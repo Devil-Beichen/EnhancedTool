@@ -8,7 +8,11 @@
 #include "SmartAI/Public/Character/SaCharacterBase.h"
 
 
-AFormationBase::AFormationBase()
+AFormationBase::AFormationBase():
+	bGameInHidden(false),
+	bAlignSurface(false),
+	bCanRandomSize(false)
+
 {
 	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
@@ -45,6 +49,7 @@ void AFormationBase::PostInitProperties()
 void AFormationBase::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
+	InstancedStaticMesh->SetHiddenInGame(bGameInHidden);
 	FormationGeneration();
 }
 
@@ -133,7 +138,6 @@ void AFormationBase::SetLightingRenderPasses(const ASaCharacterBase* Character, 
 	}
 }
 
-
 void AFormationBase::CallGenerateComplete(AFormationBase* CallFormation) const
 {
 	if (GenerateComplete.IsBound())
@@ -148,6 +152,15 @@ void AFormationBase::FormationGeneration()
 	{
 	case EFormation::EF_Rectangle:
 		FunRectangle();
+		break;
+	case EFormation::EF_Triangle:
+		FunTriangle();
+		break;
+	case EFormation::EF_Donut:
+		FunDonut();
+		break;
+	case EFormation::EF_Round:
+		FunRound();
 		break;
 	default:
 		break;
@@ -180,5 +193,158 @@ void AFormationBase::FunRectangle_Implementation()
 		TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
 		TempRelativeTransform.SetScale3D(GetThisSize3D());
 		InstancedStaticMesh->AddInstance(TempRelativeTransform);
+	}
+}
+
+void AFormationBase::FunTriangle_Implementation()
+{
+	if (Sun == 0 || !InstancedStaticMesh->GetStaticMesh()) return;
+
+	Triangle.AmountTier = 1;
+	int32 TempSun = 0;
+	FTransform TempRelativeTransform;
+	// 临时的第一层数量
+	const int32 LastGfNumber = Triangle.GfNumber - 1;
+
+	if (Triangle.bAnother)
+	{
+		while (((Triangle.AmountTier * Triangle.AmountTier * 2 + 2) / 2 - 1) + (LastGfNumber * Triangle.AmountTier) < Sun)
+		{
+			Triangle.AmountTier++;
+		}
+		for (int32 i = 1; i <= Triangle.AmountTier; i++)
+		{
+			for (int32 j = 1; j <= i * 2 + Triangle.GfNumber - 1 - 1; j++)
+			{
+				if (TempSun < Sun)
+				{
+					TempSun++;
+					const float x = (i - 1) * Spacing.X * -1;
+					const float y = (j - 1) * Spacing.Y - (i - 1) * Spacing.Y - LastGfNumber * Spacing.Y / 2.f;
+					TempRelativeTransform.SetLocation(GetFinalPosition(FVector(x, y, 0.f) + AddRandomLocation()));
+					TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
+					TempRelativeTransform.SetScale3D(GetThisSize3D());
+					InstancedStaticMesh->AddInstance(TempRelativeTransform);
+				}
+				else
+					break;
+			}
+		}
+	}
+	else
+	{
+		while (((Triangle.AmountTier * Triangle.AmountTier + Triangle.AmountTier) / 2) + (LastGfNumber * Triangle.AmountTier) < Sun)
+		{
+			Triangle.AmountTier++;
+		}
+		for (int32 i = 1; i <= Triangle.AmountTier; i++)
+		{
+			for (int32 j = 1; j <= i + LastGfNumber; j++)
+			{
+				if (TempSun < Sun)
+				{
+					TempSun++;
+					const float x = (i - 1) * Spacing.X * -1;
+					const float y = (j - 1) * Spacing.Y - LastGfNumber * Spacing.Y / 2.f - (i - 1) * Spacing.Y / 2.f;
+					TempRelativeTransform.SetLocation(GetFinalPosition(FVector(x, y, 0.f) + AddRandomLocation()));
+					TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
+					TempRelativeTransform.SetScale3D(GetThisSize3D());
+					InstancedStaticMesh->AddInstance(TempRelativeTransform);
+				}
+				else
+					break;
+			}
+		}
+	}
+}
+
+void AFormationBase::FunDonut_Implementation()
+{
+	if (Sun == 0 || Donut.NumberOfLayer == 0 || !InstancedStaticMesh->GetStaticMesh()) return;
+
+	int32 TempSun = 0;
+	FTransform TempRelativeTransform;
+
+	Donut.Layer = 0;
+	while (Donut.NumberOfLayer * Donut.Layer < Sun) { Donut.Layer++; }
+
+	for (int32 i = 0; i < Donut.Layer; i++)
+	{
+		const float TempInterval = i * Interval + Donut.CircleRadius;
+
+		for (int32 j = 0; j < Donut.NumberOfLayer; j++)
+		{
+			if (TempSun >= Sun)
+			{
+				break;
+			}
+			TempSun++;
+
+			const float StaggerAngle = j * FinalAngle() / Donut.NumberOfLayer + i * Donut.StaggerAngle;
+			const float AngleRadians = RADIAN * StaggerAngle;
+			const float x = FMath::Cos(AngleRadians) * TempInterval;
+			const float y = FMath::Sin(AngleRadians) * TempInterval;
+
+			TempRelativeTransform.SetLocation(GetFinalPosition(AddRandomLocation() + FVector(x, y, 0.f)));
+			TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
+			TempRelativeTransform.SetScale3D(GetThisSize3D());
+			InstancedStaticMesh->AddInstance(TempRelativeTransform);
+		}
+	}
+}
+
+int32 AFormationBase::GetFrontNum(const float CircleRadius, const int32 Layer) const
+{
+	return (CircleRadius * Layer * UE_DOUBLE_PI * 2) / Interval;
+}
+
+void AFormationBase::FunRound_Implementation()
+{
+	if (Sun == 0 || Interval <= 0 || !InstancedStaticMesh->GetStaticMesh()) return;
+	// 临时生成的数量
+	int32 TempSun = 0;
+	Round.Layer = 0;
+	// 所以层数的数量
+	int32 SoNumberLayers = 0;
+
+	FTransform TempRelativeTransform;
+
+	while (SoNumberLayers <= Sun - 1)
+	{
+		SoNumberLayers = GetFrontNum(Round.CircleRadius, Round.Layer) + SoNumberLayers;
+		if (SoNumberLayers < Sun)
+		{
+			Round.Layer++;
+		}
+		else
+			break;
+	}
+
+	for (int i = 1; i <= Round.Layer; i++)
+	{
+		// 单层数量
+		const int32 NumberLayers = GetFrontNum(Round.CircleRadius, i);
+
+		// 临时的距离
+		const float LastInterval = Round.CircleRadius * i;
+
+		for (int j = 0; j <= NumberLayers - 1; j++)
+		{
+			// 临时的角度
+			const float TempAngle = 360.f / NumberLayers * j;
+			// 角弧度
+			const float AngleRadians = RADIAN * TempAngle;
+			if (TempSun <= Sun - 1)
+			{
+				const float x = FMath::Cos(AngleRadians) * LastInterval;
+				const float y = FMath::Sin(AngleRadians) * LastInterval;
+
+				TempRelativeTransform.SetLocation(GetFinalPosition(AddRandomLocation() + FVector(x, y, 0.f)));
+				TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
+				TempRelativeTransform.SetScale3D(GetThisSize3D());
+				InstancedStaticMesh->AddInstance(TempRelativeTransform);
+				TempSun++;
+			}
+		}
 	}
 }
