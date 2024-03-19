@@ -11,7 +11,8 @@
 AFormationBase::AFormationBase():
 	bGameInHidden(false),
 	bAlignSurface(false),
-	bCanRandomSize(false)
+	bCanRandomSize(false),
+	bRenderCustomDepthPass(false)
 
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -50,6 +51,10 @@ void AFormationBase::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 	InstancedStaticMesh->SetHiddenInGame(bGameInHidden);
+	InstancedStaticMesh->SetLightingChannels(LightingChannels.bChannel0, LightingChannels.bChannel1, LightingChannels.bChannel2);
+	InstancedStaticMesh->SetRenderCustomDepth(bRenderCustomDepthPass);
+	InstancedStaticMesh->SetCustomDepthStencilValue(CustomDepthStencilValue);
+	InstancedStaticMesh->SetScalarParameterValueOnMaterials("ColorOffset", ColorOffset);
 	FormationGeneration();
 }
 
@@ -291,11 +296,6 @@ void AFormationBase::FunDonut_Implementation()
 			InstancedStaticMesh->AddInstance(TempRelativeTransform);
 		}
 	}
-}
-
-int32 AFormationBase::GetFrontNum(const float CircleRadius, const int32 Layer) const
-{
-	return (CircleRadius * Layer * UE_DOUBLE_PI * 2) / Interval;
 }
 
 void AFormationBase::FunRound_Implementation()

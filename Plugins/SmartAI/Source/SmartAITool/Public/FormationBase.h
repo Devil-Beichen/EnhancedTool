@@ -96,6 +96,10 @@ public:
 	UFUNCTION(BlueprintPure, Category="逸辰自定义函数")
 	FVector GetFinalPosition(FVector ApartFromLocation) const;
 
+	// 颜色偏移
+	UPROPERTY(EditAnywhere, DisplayName="颜色偏移", Category="基础")
+	float ColorOffset = 0.f;
+
 	// 阵型
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName="阵型", Category="基础|阵型相关")
 	EFormation Formation = EFormation::EF_Rectangle;
@@ -200,7 +204,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category="基础|渲染相关|函数")
 	static void SetLightingRenderPasses(const ASaCharacterBase* Character, const FLightingChannels Channels, const bool CustomDepthPass, const uint8 DepthStencilValue);
 
-
 #pragma endregion
 
 #pragma region 矩形
@@ -213,7 +216,6 @@ public:
 	// 矩形
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "阵型函数")
 	void FunRectangle();
-
 
 #pragma endregion
 
@@ -254,15 +256,14 @@ public:
 	// 圆形
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "阵型函数")
 	void FunRound();
-	
+
 	/** 前面的数量
 	 * @brief 
 	 * @param CircleRadius 半径
 	 * @param Layer 层数
 	 */
 	UFUNCTION(BlueprintPure, Category="阵型函数")
-	int32 GetFrontNum(const float CircleRadius, const int32 Layer) const;
-
+	FORCEINLINE int32 GetFrontNum(const float CircleRadius, const int32 Layer) const { return (CircleRadius * Layer * UE_DOUBLE_PI * 2) / Interval; };
 
 #pragma endregion
 };

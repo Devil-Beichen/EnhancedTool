@@ -44,11 +44,11 @@ struct FRectangle
 	GENERATED_USTRUCT_BODY()
 
 	// 横向（默认X轴为横向）
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="矩形")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, DisplayName="横向", Category="矩形")
 	int32 Crosswise;
 
 	// 纵向（默认Y轴为纵向）
-	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly, Category="矩形")
+	UPROPERTY(BlueprintReadWrite, VisibleInstanceOnly, DisplayName="纵向", Category="矩形")
 	int32 Parallel;
 
 	FRectangle(): Crosswise(4), Parallel(0)
@@ -64,15 +64,15 @@ struct FTriangle
 	GENERATED_USTRUCT_BODY()
 
 	// 另一种
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, DisplayName = "Another", Category="三角形")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, DisplayName = "另一种", Category="三角形")
 	uint8 bAnother : 1;
 
 	// 第一层数量
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="三角形")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, DisplayName="第一层数量", Category="三角形")
 	int32 GfNumber; //Ground Floor Number
 
 	// 总层数
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category="三角形")
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, DisplayName="总层数", Category="三角形")
 	int32 AmountTier;
 
 	// 初始化
@@ -88,23 +88,23 @@ struct FDonut
 	GENERATED_USTRUCT_BODY()
 
 	// 每层数量
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ClampMin = 0), Category = "圆环")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(DisplayName = "每层数量", ClampMin = 0), Category = "圆环")
 	int32 NumberOfLayer; // A number of layer(每层数量)
 
 	// 总层数
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "圆环")
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, DisplayName="总层数", Category = "圆环")
 	int32 Layer;
 
 	// 角度
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ClampMin = 0.0f, ClampMax = 360.f), Category = "圆环")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(DisplayName="角度", ClampMin = 0.0f, ClampMax = 360.f), Category = "圆环")
 	float Angle;
 
 	// 错开角度
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ClampMin = 0.0f, ClampMax = 360.f), Category = "圆环")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(DisplayName="错开角度", ClampMin = 0.0f, ClampMax = 360.f), Category = "圆环")
 	float StaggerAngle;
 
 	// 圆半径
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "圆环")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, DisplayName="半径", Category = "圆环")
 	float CircleRadius;
 
 	// 初始化
