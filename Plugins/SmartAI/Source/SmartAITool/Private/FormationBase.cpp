@@ -174,29 +174,33 @@ void AFormationBase::FormationGeneration()
 
 void AFormationBase::FunRectangle_Implementation()
 {
-	// 网格体是否有效 同时数量不为零
+	// 检查网格体是否有效且数量不为零
 	if (!InstancedStaticMesh->GetStaticMesh() || Sun == 0) return;
 
-	// 临时的变换
+	// 用于存储每个实例的临时变换信息
 	FTransform TempRelativeTransform;
 
-	// 纵向的数量
+	// 计算纵向的数量，确保至少有一个单位
 	Rectangle.Parallel = (Sun + Rectangle.Crosswise - 1) / Rectangle.Crosswise;
 
-	// 矩阵横向的一半
+	// 计算矩阵横向和纵向的一半长度，用于后续计算实例的位置
 	const float RectCrosswiseHalf = (Rectangle.Crosswise - 1) * (Spacing.X / 2.f);
-
-	// 矩阵纵向的一半
 	const float RectParallelHalf = (Rectangle.Parallel - 1) * (Spacing.Y / 2.f);
 
+	// 遍历每个实例
 	for (int32 i = 0; i < Sun; i++)
 	{
+		// 计算当前实例在矩阵中的X和Y位置
 		const float X = (((i % Rectangle.Crosswise) * Spacing.X) - RectCrosswiseHalf) * -1;
 		const float Y = ((i / Rectangle.Crosswise) * Spacing.Y) - RectParallelHalf;
 
+		// 设置实例的位置，包括调用GetFinalPosition来考虑表面对齐和随机位置偏移
 		TempRelativeTransform.SetLocation(GetFinalPosition(FVector(X, Y, 0.f) + AddRandomLocation()));
+		// 设置实例的旋转，根据GetOrientation函数的结果
 		TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
+		// 设置实例的缩放，GetThisSize3D函数可能根据需要提供不同的缩放值
 		TempRelativeTransform.SetScale3D(GetThisSize3D());
+		// 将配置好的实例添加到InstancedStaticMesh组件中
 		InstancedStaticMesh->AddInstance(TempRelativeTransform);
 	}
 }
