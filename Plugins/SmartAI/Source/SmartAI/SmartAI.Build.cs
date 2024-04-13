@@ -30,6 +30,9 @@ public class SmartAI : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
+				"HTTP",
+				"Json",
+				"JsonUtilities",
 				"AIModule",
 				"SmartAILibrary"
 				// ... add other public dependencies that you statically link with here ...
