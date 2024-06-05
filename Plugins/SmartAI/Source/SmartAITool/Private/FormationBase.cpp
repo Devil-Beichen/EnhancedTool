@@ -15,7 +15,7 @@ AFormationBase::AFormationBase():
 	bRenderCustomDepthPass(false)
 
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
 
 	Arrow = CreateDefaultSubobject<UArrowComponent>(TEXT("Arrow"));
@@ -105,7 +105,7 @@ FRotator AFormationBase::GetOrientation(const FVector& LastTempRelativeLocation)
 	switch (Direction)
 	{
 	case EDirection::ED_Default:
-		TampRotator = TempTransform.InverseTransformRotation(GetActorRotation().Quaternion()).Rotator();
+		TampRotator = TempTransform.InverseTransformRotation(Arrow->GetComponentRotation().Quaternion()).Rotator();
 		break;
 	case EDirection::ED_Surround:
 		TampRotator = FRotationMatrix::MakeFromX(TempTransform.InverseTransformPosition(TempLocation) - LastTempRelativeLocation).Rotator();
@@ -207,36 +207,59 @@ void AFormationBase::FunRectangle_Implementation()
 
 void AFormationBase::FunTriangle_Implementation()
 {
+	// 如果实例的数量为零，或者 InstancedStaticMesh 组件无效，则返回
 	if (Sun == 0 || !InstancedStaticMesh->GetStaticMesh()) return;
 
+	// 初始化三角形阵型的层数
 	Triangle.AmountTier = 1;
+
+	// 初始化已添加的实例的计数器
 	int32 TempSun = 0;
+
+	// 初始化用于存储每个实例的临时变换
 	FTransform TempRelativeTransform;
-	// 临时的第一层数量
+
+	// 第一层临时的数量
 	const int32 LastGfNumber = Triangle.GfNumber - 1;
 
+	// Y一半的距离				
+	const float HalfSpacingY = Spacing.Y / 2.f;
+
+	// 如果是另一种形式的阵型
 	if (Triangle.bAnother)
 	{
+		// 计算需要的层数来达到所需的实例数量
 		while (((Triangle.AmountTier * Triangle.AmountTier * 2 + 2) / 2 - 1) + (LastGfNumber * Triangle.AmountTier) < Sun)
 		{
 			Triangle.AmountTier++;
 		}
+		// 循环处理每一层
 		for (int32 i = 1; i <= Triangle.AmountTier; i++)
 		{
-			for (int32 j = 1; j <= i * 2 + Triangle.GfNumber - 1 - 1; j++)
+			const int LastLayer = i - 1;
+			// 循环处理每一层中的单位
+			for (int32 j = 1; j <= i * 2 + Triangle.GfNumber - 2; j++)
 			{
+				// 如果尚未达到所需的实例数量
 				if (TempSun < Sun)
 				{
 					TempSun++;
+					// 计算当前单位的位置
 					const float x = (i - 1) * Spacing.X * -1;
-					const float y = (j - 1) * Spacing.Y - (i - 1) * Spacing.Y - LastGfNumber * Spacing.Y / 2.f;
+					const float y = (j - 1) * Spacing.Y - LastLayer * Spacing.Y - LastGfNumber * HalfSpacingY;
 					TempRelativeTransform.SetLocation(GetFinalPosition(FVector(x, y, 0.f) + AddRandomLocation()));
+					// 设置当前单位的旋转
 					TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
+					// 设置当前单位的缩放
 					TempRelativeTransform.SetScale3D(GetThisSize3D());
+					// 将当前单位添加到 InstancedStaticMesh 组件
 					InstancedStaticMesh->AddInstance(TempRelativeTransform);
 				}
 				else
+				{
+					// 如果已达到所需的实例数量，则中断循环
 					break;
+				}
 			}
 		}
 	}
@@ -248,16 +271,22 @@ void AFormationBase::FunTriangle_Implementation()
 		}
 		for (int32 i = 1; i <= Triangle.AmountTier; i++)
 		{
+			const int LastLayer = i - 1;
 			for (int32 j = 1; j <= i + LastGfNumber; j++)
 			{
+				// 如果尚未达到所需的实例数量
 				if (TempSun < Sun)
 				{
 					TempSun++;
+					// 计算当前单位的位置
 					const float x = (i - 1) * Spacing.X * -1;
-					const float y = (j - 1) * Spacing.Y - LastGfNumber * Spacing.Y / 2.f - (i - 1) * Spacing.Y / 2.f;
+					const float y = (j - 1) * Spacing.Y - LastGfNumber * HalfSpacingY - LastLayer * HalfSpacingY;
 					TempRelativeTransform.SetLocation(GetFinalPosition(FVector(x, y, 0.f) + AddRandomLocation()));
+					// 设置当前单位的旋转
 					TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
+					// 设置当前单位的缩放
 					TempRelativeTransform.SetScale3D(GetThisSize3D());
+					// 将当前单位添加到 InstancedStaticMesh 组件
 					InstancedStaticMesh->AddInstance(TempRelativeTransform);
 				}
 				else
