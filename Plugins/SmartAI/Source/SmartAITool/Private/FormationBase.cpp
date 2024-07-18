@@ -143,6 +143,18 @@ void AFormationBase::SetLightingRenderPasses(const ASaCharacterBase* Character, 
 	}
 }
 
+void AFormationBase::UpdateInstanceTransform(FTransform& Transform, float X, float Y)
+{
+	// 设置实例的位置，包括调用GetFinalPosition来考虑表面对齐和随机位置偏移
+	Transform.SetLocation(GetFinalPosition(FVector(X, Y, 0.f) + AddRandomLocation()));
+	// 设置实例的旋转，根据GetOrientation函数的结果
+	Transform.SetRotation(GetOrientation(Transform.GetLocation()).Quaternion());
+	// 设置实例的缩放，GetThisSize3D函数可能根据需要提供不同的缩放值
+	Transform.SetScale3D(GetThisSize3D());
+	// 将配置好的实例添加到InstancedStaticMesh组件中
+	InstancedStaticMesh->AddInstance(Transform);
+}
+
 void AFormationBase::CallGenerateComplete(AFormationBase* CallFormation) const
 {
 	if (GenerateComplete.IsBound())
@@ -194,14 +206,7 @@ void AFormationBase::FunRectangle_Implementation()
 		const float X = (((i % Rectangle.Crosswise) * Spacing.X) - RectCrosswiseHalf) * -1;
 		const float Y = ((i / Rectangle.Crosswise) * Spacing.Y) - RectParallelHalf;
 
-		// 设置实例的位置，包括调用GetFinalPosition来考虑表面对齐和随机位置偏移
-		TempRelativeTransform.SetLocation(GetFinalPosition(FVector(X, Y, 0.f) + AddRandomLocation()));
-		// 设置实例的旋转，根据GetOrientation函数的结果
-		TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
-		// 设置实例的缩放，GetThisSize3D函数可能根据需要提供不同的缩放值
-		TempRelativeTransform.SetScale3D(GetThisSize3D());
-		// 将配置好的实例添加到InstancedStaticMesh组件中
-		InstancedStaticMesh->AddInstance(TempRelativeTransform);
+		UpdateInstanceTransform(TempRelativeTransform, X, Y);
 	}
 }
 
@@ -245,15 +250,9 @@ void AFormationBase::FunTriangle_Implementation()
 				{
 					TempSun++;
 					// 计算当前单位的位置
-					const float x = (i - 1) * Spacing.X * -1;
-					const float y = (j - 1) * Spacing.Y - LastLayer * Spacing.Y - LastGfNumber * HalfSpacingY;
-					TempRelativeTransform.SetLocation(GetFinalPosition(FVector(x, y, 0.f) + AddRandomLocation()));
-					// 设置当前单位的旋转
-					TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
-					// 设置当前单位的缩放
-					TempRelativeTransform.SetScale3D(GetThisSize3D());
-					// 将当前单位添加到 InstancedStaticMesh 组件
-					InstancedStaticMesh->AddInstance(TempRelativeTransform);
+					const float X = (i - 1) * Spacing.X * -1;
+					const float Y = (j - 1) * Spacing.Y - LastLayer * Spacing.Y - LastGfNumber * HalfSpacingY;
+					UpdateInstanceTransform(TempRelativeTransform, X, Y);
 				}
 				else
 				{
@@ -279,15 +278,9 @@ void AFormationBase::FunTriangle_Implementation()
 				{
 					TempSun++;
 					// 计算当前单位的位置
-					const float x = (i - 1) * Spacing.X * -1;
-					const float y = (j - 1) * Spacing.Y - LastGfNumber * HalfSpacingY - LastLayer * HalfSpacingY;
-					TempRelativeTransform.SetLocation(GetFinalPosition(FVector(x, y, 0.f) + AddRandomLocation()));
-					// 设置当前单位的旋转
-					TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
-					// 设置当前单位的缩放
-					TempRelativeTransform.SetScale3D(GetThisSize3D());
-					// 将当前单位添加到 InstancedStaticMesh 组件
-					InstancedStaticMesh->AddInstance(TempRelativeTransform);
+					const float X = (i - 1) * Spacing.X * -1;
+					const float Y = (j - 1) * Spacing.Y - LastGfNumber * HalfSpacingY - LastLayer * HalfSpacingY;
+					UpdateInstanceTransform(TempRelativeTransform, X, Y);
 				}
 				else
 					break;
@@ -320,13 +313,10 @@ void AFormationBase::FunDonut_Implementation()
 
 			const float StaggerAngle = j * FinalAngle() / Donut.NumberOfLayer + i * Donut.StaggerAngle;
 			const float AngleRadians = RADIAN * StaggerAngle;
-			const float x = FMath::Cos(AngleRadians) * TempInterval;
-			const float y = FMath::Sin(AngleRadians) * TempInterval;
+			const float X = FMath::Cos(AngleRadians) * TempInterval;
+			const float Y = FMath::Sin(AngleRadians) * TempInterval;
 
-			TempRelativeTransform.SetLocation(GetFinalPosition(AddRandomLocation() + FVector(x, y, 0.f)));
-			TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
-			TempRelativeTransform.SetScale3D(GetThisSize3D());
-			InstancedStaticMesh->AddInstance(TempRelativeTransform);
+			UpdateInstanceTransform(TempRelativeTransform, X, Y);
 		}
 	}
 }
@@ -369,13 +359,10 @@ void AFormationBase::FunRound_Implementation()
 			const float AngleRadians = RADIAN * TempAngle;
 			if (TempSun <= Sun - 1)
 			{
-				const float x = FMath::Cos(AngleRadians) * LastInterval;
-				const float y = FMath::Sin(AngleRadians) * LastInterval;
+				const float X = FMath::Cos(AngleRadians) * LastInterval;
+				const float Y = FMath::Sin(AngleRadians) * LastInterval;
 
-				TempRelativeTransform.SetLocation(GetFinalPosition(AddRandomLocation() + FVector(x, y, 0.f)));
-				TempRelativeTransform.SetRotation(GetOrientation(TempRelativeTransform.GetLocation()).Quaternion());
-				TempRelativeTransform.SetScale3D(GetThisSize3D());
-				InstancedStaticMesh->AddInstance(TempRelativeTransform);
+				UpdateInstanceTransform(TempRelativeTransform, X, Y);
 				TempSun++;
 			}
 		}

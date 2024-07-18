@@ -204,6 +204,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category="基础|渲染相关|函数")
 	static void SetLightingRenderPasses(const ASaCharacterBase* Character, const FLightingChannels Channels, const bool CustomDepthPass, const uint8 DepthStencilValue);
 
+	// 更新实例位置
+	void UpdateInstanceTransform(FTransform& Transform, float X, float Y);
+
 #pragma endregion
 
 #pragma region 矩形
